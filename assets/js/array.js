@@ -146,3 +146,43 @@ for (const item of myCollection) {
 console.log("2. Використання spread-оператора:");
 const arr = [...myCollection];
 console.log(arr);
+
+console.log("\n--- ЗАВДАННЯ 4  ---");
+
+const checkSequence = (expression, config = ["()", "[]", "{}", "<>"]) => {
+  const bracketsMap = {};
+  const openBrackets = [];
+
+  for (let pair of config) {
+    const open = pair[0];
+    const close = pair[1];
+
+    bracketsMap[close] = open;
+    openBrackets.push(open);
+  }
+
+  const stack = [];
+
+  for (let char of expression) {
+    if (openBrackets.includes(char)) {
+      stack.push(char);
+    } else if (bracketsMap[char]) {
+      const lastOpen = stack.pop();
+
+      if (lastOpen !== bracketsMap[char]) {
+        return false;
+      }
+    }
+  }
+
+  return stack.length === 0;
+};
+
+console.log("()(([])) ->", checkSequence("()(([]))"));
+console.log("{][) ->", checkSequence("{][)"));
+console.log("(Text) ->", checkSequence("(Text)"));
+console.log("(( ->", checkSequence("(("));
+
+console.log("Custom config [(), []]:");
+console.log("([]) ->", checkSequence("([])", ["()", "[]"]));
+console.log("{} ->", checkSequence("{}", ["()", "[]"]));
