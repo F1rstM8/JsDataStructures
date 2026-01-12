@@ -95,20 +95,54 @@ console.log("\nВидаляємо 10 (head):");
 myList.deleteItem(10);
 myList.print();
 
-console.log("--- ЗАВДАННЯ 2 ---");
+console.log("--- ЗАВДАННЯ 2 та 3 (Об'єднані) ---");
+
 class NumberedCollection {
   constructor() {
-    this.items = {};
-    this.count = 1;
+    Object.defineProperty(this, "count", {
+      value: 1,
+      writable: true,
+      enumerable: false,
+    });
   }
 
   add(data) {
-    this.items[`*${this.count}*`] = data;
+    this[`*${this.count}*`] = data;
     this.count++;
   }
-}
-const list = new NumberedCollection();
-list.add("Перший");
-list.add("Другий");
 
-console.log(list.items);
+  [Symbol.iterator]() {
+    let index = 1;
+    const collection = this;
+
+    return {
+      next() {
+        if (index < collection.count) {
+          const value = collection[`*${index}*`];
+          index++;
+          return { value: value, done: false };
+        } else {
+          return { done: true };
+        }
+      },
+    };
+  }
+}
+
+console.log("\n>>> Перевірка структури (Завдання 2):");
+
+const myCollection = new NumberedCollection();
+myCollection.add("first value");
+myCollection.add("second value");
+myCollection.add("third value");
+
+console.log(myCollection);
+console.log("\n>>> Перевірка ітератора (Завдання 3):");
+
+console.log("1. Перебір через for...of:");
+for (const item of myCollection) {
+  console.log(item);
+}
+console.log("2. Використання spread-оператора:");
+const arr = [...myCollection];
+console.log(arr);
