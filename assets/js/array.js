@@ -1,4 +1,5 @@
 console.log("--- ЗАВДАННЯ 1 ---");
+
 class Node {
   constructor(data) {
     this.data = data;
@@ -24,14 +25,22 @@ class LinkedList {
     current.next = newNode;
   }
 
+  // виправлення 1: Новий метод print()
   print() {
     let current = this.head;
-    const elements = [];
+    let output = "";
+
     while (current) {
-      elements.push(current.data);
+      output += current.data;
+
+      if (current.next) {
+        output += " -> ";
+      }
+
       current = current.next;
     }
-    console.log(elements.join(" -> "));
+
+    console.log(output || "Список порожній");
   }
 
   deleteItem(data) {
@@ -43,7 +52,6 @@ class LinkedList {
     }
 
     let current = this.head;
-
     while (current.next) {
       if (current.next.data === data) {
         current.next = current.next.next;
@@ -53,7 +61,17 @@ class LinkedList {
     }
   }
 
+  // --- ВИПРАВЛЕННЯ 2: Валідація позиції ---
   addNthElement(data, position) {
+    if (position < 0) {
+      console.log("Помилка: Позиція не може бути від'ємною");
+      return;
+    }
+    if (typeof position !== "number") {
+      console.log("Помилка: Позиція має бути числом");
+      return;
+    }
+
     const newNode = new Node(data);
     let current = this.head;
     let count = 0;
@@ -61,7 +79,6 @@ class LinkedList {
     while (current) {
       if (count === position) {
         newNode.next = current.next;
-
         current.next = newNode;
         return;
       }
@@ -69,33 +86,26 @@ class LinkedList {
       current = current.next;
     }
 
-    console.log("Помилка: Позиція виходить за межі списку");
+    console.log(
+      `Помилка: Позиція ${position} виходить за межі списку (довжина: ${count})`
+    );
   }
 }
 
 const myList = new LinkedList();
-
 myList.append(10);
 myList.append(20);
 myList.append(30);
-myList.append(40);
 
-console.log("Початковий список:");
+console.log("--- Тест нового print() ---");
 myList.print();
 
-console.log("\nВидаляємо 20:");
-myList.deleteItem(20);
+console.log("\n--- Тест валідації addNthElement ---");
+myList.addNthElement(99, -5);
+myList.addNthElement(55, 1);
 myList.print();
 
-console.log("\nВставляємо 99 після позиції 1:");
-myList.addNthElement(99, 1);
-myList.print();
-
-console.log("\nВидаляємо 10 (head):");
-myList.deleteItem(10);
-myList.print();
-
-console.log("--- ЗАВДАННЯ 2 та 3 (Об'єднані) ---");
+console.log("--- ЗАВДАННЯ 2 та 3 ---"); //переробив
 
 class NumberedCollection {
   constructor() {
@@ -128,45 +138,71 @@ class NumberedCollection {
     };
   }
 }
-
-console.log("\n>>> Перевірка структури (Завдання 2):");
-
 const myCollection = new NumberedCollection();
 myCollection.add("first value");
 myCollection.add("second value");
 myCollection.add("third value");
 
+console.log("1. Вигляд об'єкта (Завдання 2):");
 console.log(myCollection);
-console.log("\n>>> Перевірка ітератора (Завдання 3):");
 
-console.log("1. Перебір через for...of:");
+console.log("\n2. Перебір циклом (Завдання 3):");
 for (const item of myCollection) {
   console.log(item);
 }
-console.log("2. Використання spread-оператора:");
-const arr = [...myCollection];
-console.log(arr);
+console.log("\n--- ЗАВДАННЯ 4  ---"); //переробив,створив класс стек та використав .push,pop,isEmpty замість методів масиву
 
-console.log("\n--- ЗАВДАННЯ 4  ---");
+class Stack {
+  constructor() {
+    this.items = [];
+  }
+
+  push(element) {
+    this.items.push(element);
+  }
+
+  pop() {
+    if (this.isEmpty()) {
+      return "Underflow";
+    }
+    return this.items.pop();
+  }
+
+  peek() {
+    if (this.isEmpty()) {
+      return null;
+    }
+    return this.items[this.items.length - 1];
+  }
+
+  isEmpty() {
+    return this.items.length === 0;
+  }
+
+  size() {
+    return this.items.length;
+  }
+}
 
 const checkSequence = (expression, config = ["()", "[]", "{}", "<>"]) => {
   const bracketsMap = {};
   const openBrackets = [];
 
   for (let pair of config) {
-    const open = pair[0];
-    const close = pair[1];
-
-    bracketsMap[close] = open;
-    openBrackets.push(open);
+    bracketsMap[pair[1]] = pair[0];
+    openBrackets.push(pair[0]);
   }
 
-  const stack = [];
+  const stack = new Stack();
 
   for (let char of expression) {
     if (openBrackets.includes(char)) {
       stack.push(char);
     } else if (bracketsMap[char]) {
+      if (stack.isEmpty()) {
+        return false;
+      }
+
       const lastOpen = stack.pop();
 
       if (lastOpen !== bracketsMap[char]) {
@@ -175,14 +211,23 @@ const checkSequence = (expression, config = ["()", "[]", "{}", "<>"]) => {
     }
   }
 
-  return stack.length === 0;
+  return stack.isEmpty();
 };
 
+console.log("Тест стеку:");
+const myStack = new Stack();
+myStack.push(1);
+myStack.push(2);
+console.log("Peek:", myStack.peek());
+console.log("Pop:", myStack.pop());
+console.log("IsEmpty:", myStack.isEmpty());
+
+console.log("\nТест функції checkSequence:");
 console.log("()(([])) ->", checkSequence("()(([]))"));
 console.log("{][) ->", checkSequence("{][)"));
-console.log("(Text) ->", checkSequence("(Text)"));
 console.log("(( ->", checkSequence("(("));
+console.log("(Text) ->", checkSequence("(Text)"));
 
-console.log("Custom config [(), []]:");
-console.log("([]) ->", checkSequence("([])", ["()", "[]"]));
-console.log("{} ->", checkSequence("{}", ["()", "[]"]));
+console.log("\nКастомні налаштування (тільки <>):");
+console.log("<> ->", checkSequence("<>", ["<>"]));
+console.log("() ->", checkSequence("()", ["<>"]));
