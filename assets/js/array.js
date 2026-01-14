@@ -1,4 +1,4 @@
-console.log("--- ЗАВДАННЯ 1 ---");
+console.log("--- ЗАВДАННЯ 1: LinkedList (з Error Handling) ---");
 
 class Node {
   constructor(data) {
@@ -25,18 +25,15 @@ class LinkedList {
     current.next = newNode;
   }
 
-  // виправлення 1: Новий метод print()
   print() {
     let current = this.head;
     let output = "";
 
     while (current) {
       output += current.data;
-
       if (current.next) {
         output += " -> ";
       }
-
       current = current.next;
     }
 
@@ -60,16 +57,15 @@ class LinkedList {
       current = current.next;
     }
   }
-
-  // --- ВИПРАВЛЕННЯ 2: Валідація позиції ---
   addNthElement(data, position) {
-    if (position < 0) {
-      console.log("Помилка: Позиція не може бути від'ємною");
-      return;
-    }
     if (typeof position !== "number") {
-      console.log("Помилка: Позиція має бути числом");
-      return;
+      throw new Error(
+        `Помилка: Позиція має бути числом (отримано ${typeof position})`
+      );
+    }
+
+    if (position < 0) {
+      throw new Error(`Помилка: Позиція не може бути від'ємною (${position})`);
     }
 
     const newNode = new Node(data);
@@ -86,7 +82,7 @@ class LinkedList {
       current = current.next;
     }
 
-    console.log(
+    throw new Error(
       `Помилка: Позиція ${position} виходить за межі списку (довжина: ${count})`
     );
   }
@@ -97,13 +93,28 @@ myList.append(10);
 myList.append(20);
 myList.append(30);
 
-console.log("--- Тест нового print() ---");
+console.log("Початковий список:");
 myList.print();
 
-console.log("\n--- Тест валідації addNthElement ---");
-myList.addNthElement(99, -5);
-myList.addNthElement(55, 1);
-myList.print();
+try {
+  console.log("\n1. Спроба додати елемент на позицію 1 (успіх):");
+  myList.addNthElement(55, 1);
+  myList.print();
+
+  console.log("\n2. Спроба додати елемент на позицію -5 (має бути помилка):");
+  myList.addNthElement(99, -5);
+
+  console.log("Цей текст не виведеться, бо сталася помилка вище");
+} catch (error) {
+  console.error("ПОМИЛКА:", error.message);
+}
+
+try {
+  console.log("\n3. Спроба додати за межі списку:");
+  myList.addNthElement(100, 999);
+} catch (error) {
+  console.error("ПОМИЛКА:", error.message);
+}
 
 console.log("--- ЗАВДАННЯ 2 та 3 ---"); //переробив
 
